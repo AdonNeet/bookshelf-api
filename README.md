@@ -5,7 +5,7 @@ Submission Bookshelf API &rarr; Kelas Belajar Membuat Aplikasi Back-End untuk Pe
 
 ## directory structure
 
-Ini merupakan dasar struktur direktori untuk Bookshelf API
+Ini merupakan struktur direktori untuk Bookshelf API
 
 ```bash
 src
@@ -25,6 +25,8 @@ src
 │
 └── server.js
 .eslintrc.json
+eslint.config.mjs
+package-lock.json
 package.json
 README.md
 ```
