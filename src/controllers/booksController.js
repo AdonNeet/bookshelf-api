@@ -1,5 +1,5 @@
 const { nanoid } = require('nanoid');
-const books = [];
+const books = require('../database/bookDb');
 
 const addBookHandler = (request, h) => {
   const { name, year, author, summary, publisher, pageCount, readPage, reading } = request.payload;
@@ -30,36 +30,46 @@ const addBookHandler = (request, h) => {
   };
   books.push(newBook);
 
-  return h.response({
-    status: 'success',
-    message: 'Buku berhasil ditambahkan',
-    data: { bookId: id },
-  }).code(201);
+  const isSuccess = books.filter((book) => book.id === id).length > 0;
+
+  if(isSuccess) {
+    return h.response({
+      status: 'success',
+      message: 'Buku berhasil ditambahkan',
+      data: { bookId: id },
+    }).code(201);
+  } else {
+    return h.response({
+      status: 'fail',
+      message: 'Gagal menambahkan buku.',
+    }).code(500);
+  }
+  
 };
 
-const getAllBooksHandler = (req) => {
+const getAllBooksHandler = (req, h) => {
   const { reading, finished, name } = req.query;
   
-  let filteredBooks = books;
+  let filterBooks = books;
 
   if (reading !== undefined) {
-    filteredBooks = filteredBooks.filter(book => book.reading === Boolean(Number(reading)));
+    filterBooks = filterBooks.filter(book => book.reading === Boolean(Number(reading)));
   }
 
   if (finished !== undefined) {
-    filteredBooks = filteredBooks.filter(book => book.finished === Boolean(Number(finished)));
+    filterBooks = filterBooks.filter(book => book.finished === Boolean(Number(finished)));
   }
 
   if (name) {
-    filteredBooks = filteredBooks.filter(book => book.name.toLowerCase().includes(name.toLowerCase()));
+    filterBooks = filterBooks.filter(book => book.name.toLowerCase().includes(name.toLowerCase()));
   }
 
-  return {
+  return h.response({
     status: 'success',
     data: {
-      books: filteredBooks.map(({ id, name, publisher }) => ({ id, name, publisher })),
+      books: filterBooks.map(({ id, name, publisher }) => ({ id, name, publisher })),
     },
-  };
+  }).code(200);
 };
 
 
@@ -72,12 +82,12 @@ const getBookByIdHandler = (request, h) => {
       status: 'fail',
       message: 'Buku tidak ditemukan',
     }).code(404);
+  } else {
+    return h.response({
+      status: 'success',
+      data: { book },
+    }).code(200);
   }
-
-  return {
-    status: 'success',
-    data: { book },
-  };
 };
 
 const updateBookByIdHandler = (request, h) => {
@@ -98,7 +108,7 @@ const updateBookByIdHandler = (request, h) => {
     }).code(400);
   }
 
-  const bookIndex = books.findIndex((b) => b.id === bookId);
+  const bookIndex = books.findIndex((book) => book.id === bookId);
 
   if (bookIndex === -1) {
     return h.response({
@@ -116,15 +126,25 @@ const updateBookByIdHandler = (request, h) => {
     updatedAt
   };
 
-  return h.response({
-    status: 'success',
-    message: 'Buku berhasil diperbarui',
-  }).code(200);
+  const isSuccess = books.filter((book) => (book.updatedAt === updatedAt) && (book.id == bookId)).length > 0;
+
+  if(isSuccess) {
+    return h.response({
+      status: 'success',
+      message: 'Buku berhasil diperbarui',
+    }).code(200);
+  } else {
+    return h.response({
+      status: 'fail',
+      message: 'Gagal memperbarui buku.',
+    }).code(500);
+  }
+  
 };
 
 const deleteBookByIdHandler = (request, h) => {
   const { bookId } = request.params;
-  const bookIndex = books.findIndex((b) => b.id === bookId);
+  const bookIndex = books.findIndex((book) => book.id === bookId);
 
   if (bookIndex === -1) {
     return h.response({
@@ -135,10 +155,19 @@ const deleteBookByIdHandler = (request, h) => {
 
   books.splice(bookIndex, 1);
 
-  return h.response({
-    status: 'success',
-    message: 'Buku berhasil dihapus',
-  }).code(200);
+  const isSuccess = books.filter((book) => book.id === bookId).length === 0;
+
+  if(isSuccess){
+    return h.response({
+      status: 'success',
+      message: 'Buku berhasil dihapus',
+    }).code(200);
+  } else {
+    return h.response({
+      status: 'fail',
+      message: 'Buku gagal dihapus.',
+    }).code(500);
+  }
 };
 
 module.exports = {

@@ -5,13 +5,16 @@ Submission Bookshelf API &rarr; Kelas Belajar Membuat Aplikasi Back-End untuk Pe
 
 ## directory structure
 
-Ini merupakan struktur direktori untuk Bookshelf API
+Ini merupakan dasar struktur direktori untuk Bookshelf API
 
 ```bash
 src
 │
 ├── controllers
 │   └── booksController.js
+│
+├── database
+│   └── bookDb.js
 │
 ├── routes
 │   └── books.js
@@ -44,4 +47,4 @@ npm run start-dev
 npm run test
 ```
 
-bara_donta_perdana
+**bara_donta_perdana, 2024**
